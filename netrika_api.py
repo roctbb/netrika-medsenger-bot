@@ -1,3 +1,4 @@
+import base64
 from datetime import datetime
 
 import requests
@@ -92,9 +93,9 @@ def echo_document(document_id):
     }
 
     print("Send to {}: {}".format(NETRIKA_HOST, data))
-
+    answer = requests.post(NETRIKA_HOST, json=data)
     try:
-        return answer.content
+        return ["document.pdf", answer.headers.get('Content-Type'), base64.b64encode(answer.content)]
     except Exception as e:
         print(e)
         return None

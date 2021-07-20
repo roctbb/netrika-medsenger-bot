@@ -58,6 +58,7 @@ def init(data):
 
     contract = Contract(patient_id=info['id'])
     db.session.add(contract)
+    db.session.commit()
 
     return "ok"
 

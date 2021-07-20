@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, abort, render_template
 
 import netrika_api
 from manage import *
@@ -71,12 +71,12 @@ def remove(data):
         db.session.commit()
     return "ok"
 
-@app.route('/settings', methods=['GET'])
+@app.route('/setup', methods=['GET'])
 @verify_args
 def get_setup(args, form):
     return get_settings(args, form)
 
-@app.route('/settings', methods=['POST'])
+@app.route('/setup', methods=['POST'])
 @verify_args
 def set_setup(args, form):
     return set_settings(args, form)

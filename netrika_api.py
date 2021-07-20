@@ -95,6 +95,7 @@ def echo_document(document_id):
     print("Send to {}: {}".format(NETRIKA_HOST, data))
     answer = requests.post(NETRIKA_HOST, json=data)
     try:
+        print(answer.headers)
         return ["document.pdf", answer.headers.get('Content-Type'), base64.b64encode(answer.content)]
     except Exception as e:
         print(e)

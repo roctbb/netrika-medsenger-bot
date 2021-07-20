@@ -85,6 +85,15 @@ def set_setup(args, form):
 @app.route('/settings', methods=['GET'])
 @verify_args
 def get_settings(args, form):
+    return gs(args, form)
+
+
+@app.route('/settings', methods=['POST'])
+@verify_args
+def set_settings(args, form):
+    return ss(args, form)
+
+def gs(args, form):
     contract = Contract.query.filter_by(id=args.get('contract_id')).first()
     if not contract:
         abort(404)
@@ -92,10 +101,7 @@ def get_settings(args, form):
         return "<h3>Связь с региональной системой успешно установлена.</h3><p>Этот интеллектуальный агент будет автоматически пересылать все новые документы. Дополнительная настройка не требуется.</p>"
     return render_template('settings.html', patient=contract.patient, error='')
 
-
-@app.route('/settings', methods=['POST'])
-@verify_args
-def set_settings(args, form):
+def ss(args, form):
     contract_id = args.get('contract_id')
     contract = Contract.query.filter_by(id=contract_id).first()
 
@@ -112,7 +118,6 @@ def set_settings(args, form):
             return render_template('settings.html', patient=contract.patient, error='Проверьте правильность полиса.')
     else:
         abort(404)
-
 
 def tasks(app):
     with app.app_context():

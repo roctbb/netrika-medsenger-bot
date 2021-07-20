@@ -74,12 +74,12 @@ def remove(data):
 @app.route('/setup', methods=['GET'])
 @verify_args
 def get_setup(args, form):
-    return get_settings(args, form)
+    return gs(args, form)
 
 @app.route('/setup', methods=['POST'])
 @verify_args
 def set_setup(args, form):
-    return set_settings(args, form)
+    return ss(args, form)
 
 # settings and views
 @app.route('/settings', methods=['GET'])

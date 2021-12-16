@@ -15,7 +15,7 @@ def add_patient(patient_id, email, name, birthday, sex, policy):
             "patient_id": patient_id,
             "email": email,
             "sex": sex,
-            "policy": policy
+            "snils": policy
         }
     }
 

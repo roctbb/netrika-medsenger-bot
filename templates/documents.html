@@ -3,7 +3,7 @@
 {% block content %}
     <div class="row">
         {% for document in documents %}
-            <div class="col-6 col-md-4">
+            <div class="col-6 col-md-4" style="padding-top: 5px; padding-bottom: 5px;">
                 <form method="post">
 
                     <input type="hidden" name="document_id" value="{{ document['document_id'] }}">

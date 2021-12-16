@@ -83,7 +83,6 @@ def encounter_search(patient_netrika_id):
         print(e)
         return None
 
-
 def echo_document(document_id):
     data = {
         "command": "echo_document",
@@ -97,6 +96,22 @@ def echo_document(document_id):
     try:
         print(answer.headers)
         return ["document.pdf", answer.headers.get('Content-Type'), base64.b64encode(answer.content)]
+    except Exception as e:
+        print(e)
+        return None
+
+def get_document(document_id):
+    data = {
+        "command": "echo_document",
+        "params": {
+            "document_id": document_id
+        }
+    }
+
+    print("Send to {}: {}".format(NETRIKA_HOST, data))
+    answer = requests.post(NETRIKA_HOST, json=data)
+    try:
+        return ["document.pdf", answer.headers.get('Content-Type'), answer.content]
     except Exception as e:
         print(e)
         return None

@@ -1,4 +1,4 @@
-from flask import jsonify, abort, render_template
+from flask import jsonify, abort, render_template, make_response
 
 import netrika_api
 from manage import *
@@ -26,17 +26,16 @@ def status(data):
     return jsonify(answer)
 
 
-
 def init_patient(patient, contract_id):
     if patient.police:
         info = medsenger_api.get_patient_info(contract_id)
         patient.netrika_id = netrika_api.add_patient(info['id'], info['email'], info['name'], info['birthday'], info['sex'],
-                                             patient.police)
+                                                     patient.police)
+
 
 def init_case(contract_id):
     info = medsenger_api.get_patient_info(contract_id)
     netrika_api.create_case(info['id'], info['doctor_id'], contract_id, info['doctor_name'])
-
 
 
 @app.route('/init', methods=['POST'])
@@ -56,7 +55,8 @@ def init(data):
     if patient.netrika_id:
         init_case(contract_id)
     else:
-        medsenger_api.send_message(contract_id=contract_id, text="Чтобы получать документы поцаиента из региональной системы, укажите корректный СНИЛС.", action_link="setup", action_name="Указать", only_doctor=True, need_answer=False)
+        medsenger_api.send_message(contract_id=contract_id, text="Чтобы получать документы поцаиента из региональной системы, укажите корректный СНИЛС.", action_link="setup", action_name="Указать",
+                                   only_doctor=True, need_answer=False)
 
     contract = Contract(id=contract_id, patient_id=info['id'])
     db.session.add(contract)
@@ -74,15 +74,18 @@ def remove(data):
         db.session.commit()
     return "ok"
 
+
 @app.route('/setup', methods=['GET'])
 @verify_args
 def get_setup(args, form):
     return gs(args, form)
 
+
 @app.route('/setup', methods=['POST'])
 @verify_args
 def set_setup(args, form):
     return ss(args, form)
+
 
 # settings and views
 @app.route('/settings', methods=['GET'])
@@ -96,6 +99,7 @@ def get_settings(args, form):
 def set_settings(args, form):
     return ss(args, form)
 
+
 def gs(args, form):
     contract = Contract.query.filter_by(id=args.get('contract_id')).first()
     if not contract:
@@ -103,6 +107,7 @@ def gs(args, form):
     if contract.patient.netrika_id:
         return "<h3>Связь с региональной системой успешно установлена.</h3><p>Этот интеллектуальный агент будет автоматически пересылать все новые документы. Дополнительная настройка не требуется.</p>"
     return render_template('settings.html', patient=contract.patient, error='')
+
 
 def ss(args, form):
     contract_id = args.get('contract_id')
@@ -122,6 +127,7 @@ def ss(args, form):
     else:
         abort(404)
 
+
 @app.route('/documents', methods=['GET'])
 @verify_args
 def documents(args, form):
@@ -140,6 +146,32 @@ def documents(args, form):
         abort(404)
 
 
+@app.route('/documents', methods=['POST'])
+@verify_args
+def documents(args, form):
+    contract_id = args.get('contract_id')
+    contract = Contract.query.filter_by(id=contract_id).first()
+
+    document_id = form.get('document_id')
+
+    if contract and contract.patient.netrika_id:
+        answer = netrika_api.get_document(document_id)
+
+        if not answer:
+            abort(404)
+
+        name, mime, data = answer
+
+        print("requested document ", document_id)
+
+        response = make_response(data)
+        response.headers.set('Content-Type', mime)
+        response.headers.set(
+            'Content-Disposition', 'attachment', filename=name)
+        return response
+    else:
+        abort(404)
+
 
 def tasks(app):
     with app.app_context():
@@ -156,7 +188,8 @@ def tasks(app):
                 for doc in new_docs:
                     attachment = netrika_api.echo_document(doc.get('document_id'))
                     for contract in patient.contracts:
-                        medsenger_api.send_message(contract_id=contract.id, text="Новый документ в региональной системе: {}".format(doc.get('description')), only_doctor=True, need_answer=False, attachments=[attachment])
+                        medsenger_api.send_message(contract_id=contract.id, text="Новый документ в региональной системе: {}".format(doc.get('description')), only_doctor=True, need_answer=False,
+                                                   attachments=[attachment])
                     patient.sent_documents.append(doc.get('document_id'))
         db.session.commit()
 

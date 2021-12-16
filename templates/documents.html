@@ -5,8 +5,14 @@
     <title>Title</title>
 </head>
 <body>
+
 {% for document in documents %}
-- {{ document['description'] }}<br>
+    <form method="post">
+        <input type="hidden" name="document_id" value="{{ document['document_id'] }}">
+        <button>{{ document['description'] }}</button>
+    </form>
+    <br>
 {% endfor %}
+
 </body>
 </html>

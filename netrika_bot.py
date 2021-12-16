@@ -25,6 +25,8 @@ def status(data):
 
     return jsonify(answer)
 
+
+
 def init_patient(patient, contract_id):
     if patient.police:
         info = medsenger_api.get_patient_info(contract_id)
@@ -119,6 +121,25 @@ def ss(args, form):
             return render_template('settings.html', patient=contract.patient, error='Проверьте правильность полиса.')
     else:
         abort(404)
+
+@app.route('/documents', methods=['POST'])
+@verify_args
+def documents(args, form):
+    contract_id = args.get('contract_id')
+    contract = Contract.query.filter_by(id=contract_id).first()
+
+    if contract:
+        patient = contract.patient
+
+        if patient.netrika_id:
+            documents = netrika_api.encounter_search(patient.netrika_id)
+            return render_template('documents.html', documents=documents)
+        else:
+            return render_template('documents.html', documents=[])
+    else:
+        abort(404)
+
+
 
 def tasks(app):
     with app.app_context():

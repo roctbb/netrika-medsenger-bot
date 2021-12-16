@@ -1,18 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Документы в РЕГИЗ{% endblock %}
+{% block content %}
+    <div class="row">
+        {% for document in documents %}
+            <form method="post">
 
-{% for document in documents %}
-    <form method="post">
-        <input type="hidden" name="document_id" value="{{ document['document_id'] }}">
-        <button>{{ document['description'] }}</button>
-    </form>
-    <br>
-{% endfor %}
+                <input type="hidden" name="document_id" value="{{ document['document_id'] }}">
 
-</body>
-</html>
+                <div class="col-6 col-sm-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text">{{ document['description'] }}</p>
+                            <button class="btn btn-primary btn-sm">Скачать</button>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+            <br>
+        {% endfor %}
+    </div>
+{% endblock %}

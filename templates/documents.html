@@ -3,20 +3,22 @@
 {% block content %}
     <div class="row">
         {% for document in documents %}
-            <form method="post">
+            <div class="col-6 col-md-4">
+                <form method="post">
 
-                <input type="hidden" name="document_id" value="{{ document['document_id'] }}">
+                    <input type="hidden" name="document_id" value="{{ document['document_id'] }}">
 
-                <div class="col-6 col-sm-3">
+
                     <div class="card">
                         <div class="card-body">
                             <p class="card-text">{{ document['description'] }}</p>
                             <button class="btn btn-primary btn-sm">Скачать</button>
                         </div>
                     </div>
-                </div>
 
-            </form>
+
+                </form>
+            </div>
             <br>
         {% endfor %}
     </div>

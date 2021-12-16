@@ -1,25 +1,31 @@
 {% extends "base.html" %}
 {% block title %}Настройка интеграции{% endblock %}
 
-{% block content  %}
-<div class="container" style="margin-top: 15px;">
+{% block content %}
+    <div class="container" style="margin-top: 15px;">
 
         {% if error %}
             <div class="alert alert-danger" role="alert">
                 {{ error }}
             </div>
         {% endif %}
-    
-       <form class="form" method="post">
-           <h6>СНИЛС:</h6>
-           
-           <div class="form-group">
-               <input type="text" class="form-control" name="police" value="{% if patient.police %}{{ patient.police }}{% endif %}" />
-           </div>
 
-           <button class="btn btn-success">Сохранить</button>
-       </form>
+        <form class="form" method="post">
+            <h6>СНИЛС:</h6>
+
+            <div class="form-group">
+                <input type="text" class="form-control" name="police" id="police" value="{% if patient.police %}{{ patient.police }}{% endif %}"/>
+            </div>
+
+            <button class="btn btn-success">Сохранить</button>
+        </form>
+
+        <script>
+            $(document).ready(function () {
+                $("#police").mask("999-999-999 99");
+            })
+        </script>
 
 
-</div>
+    </div>
 {% endblock %}

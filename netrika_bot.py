@@ -122,7 +122,7 @@ def ss(args, form):
     else:
         abort(404)
 
-@app.route('/documents', methods=['POST'])
+@app.route('/documents', methods=['GET'])
 @verify_args
 def documents(args, form):
     contract_id = args.get('contract_id')

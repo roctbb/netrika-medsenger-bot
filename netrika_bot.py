@@ -148,7 +148,7 @@ def documents(args, form):
 
 @app.route('/documents', methods=['POST'])
 @verify_args
-def documents(args, form):
+def download(args, form):
     contract_id = args.get('contract_id')
     contract = Contract.query.filter_by(id=contract_id).first()
 

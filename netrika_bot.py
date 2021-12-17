@@ -179,15 +179,18 @@ def tasks(app):
                 if not patient.sent_documents:
                     patient.sent_documents = []
                 docs = netrika_api.encounter_search(patient.netrika_id)
-
                 new_docs = filter(lambda doc: doc.get('document_id') and doc.get('document_id') not in patient.sent_documents, docs)
 
-                for doc in new_docs:
-                    attachment = netrika_api.echo_document(doc.get('document_id'))
-                    for contract in patient.contracts:
-                        medsenger_api.send_message(contract_id=contract.id, text="Новый документ в региональной системе: {}".format(doc.get('description')), only_doctor=True, need_answer=False,
-                                                   attachments=[attachment])
-                    patient.sent_documents.append(doc.get('document_id'))
+                if not patient.sent_documents:
+                    for doc in new_docs:
+                        patient.sent_documents.append(doc.get('document_id'))
+                else:
+                    for doc in new_docs:
+                        attachment = netrika_api.echo_document(doc.get('document_id'))
+                        for contract in patient.contracts:
+                            medsenger_api.send_message(contract_id=contract.id, text="Новый документ в региональной системе: {}".format(doc.get('description')), only_doctor=True, need_answer=False,
+                                                       attachments=[attachment])
+                        patient.sent_documents.append(doc.get('document_id'))
         db.session.commit()
 
 

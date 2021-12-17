@@ -54,9 +54,6 @@ def init(data):
 
     if patient.netrika_id:
         init_case(contract_id)
-    else:
-        medsenger_api.send_message(contract_id=contract_id, text="Чтобы получать документы поцаиента из региональной системы, укажите корректный СНИЛС.", action_link="setup", action_name="Указать",
-                                   only_doctor=True, need_answer=False)
 
     contract = Contract(id=contract_id, patient_id=info['id'])
     db.session.add(contract)

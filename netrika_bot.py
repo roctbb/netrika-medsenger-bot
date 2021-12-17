@@ -135,7 +135,12 @@ def documents(args, form):
         patient = contract.patient
 
         if patient.netrika_id:
-            documents = netrika_api.encounter_search(patient.netrika_id)
+            if patient.available_documents:
+                documents = patient.available_documents
+            else:
+                documents = netrika_api.encounter_search(patient.netrika_id)
+                patient.available_documents = documents
+                db.session.commit()
             return render_template('documents.html', documents=documents)
         else:
             return render_template('documents.html', documents=[])
@@ -179,6 +184,10 @@ def tasks(app):
                 if not patient.sent_documents:
                     patient.sent_documents = []
                 docs = netrika_api.encounter_search(patient.netrika_id)
+
+                if not patient.available_documents:
+                    patient.available_documents = docs
+
                 new_docs = filter(lambda doc: doc.get('document_id') and doc.get('document_id') not in patient.sent_documents, docs)
 
                 if not patient.sent_documents:

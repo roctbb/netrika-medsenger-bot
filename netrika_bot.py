@@ -104,7 +104,7 @@ def gs(args, form):
     contract = Contract.query.filter_by(id=args.get('contract_id')).first()
     if not contract:
         abort(404)
-    return render_template('settings.html', patient=contract.patient, error='')
+    return render_template('settings.html', contract=contract, error='')
 
 
 def ss(args, form):

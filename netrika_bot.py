@@ -1,3 +1,5 @@
+import uuid
+
 from flask import jsonify, abort, render_template, make_response
 
 import netrika_api
@@ -26,16 +28,16 @@ def status(data):
     return jsonify(answer)
 
 
-def init_patient(patient, contract_id):
+def init_patient(patient, contract_id, uid):
     if patient.police:
         info = medsenger_api.get_patient_info(contract_id)
-        patient.netrika_id = netrika_api.add_patient(info['id'], info['email'], info['name'], info['birthday'], info['sex'],
+        patient.netrika_id = netrika_api.add_patient(uid, info['email'], info['name'], info['birthday'], info['sex'],
                                                      patient.police)
 
 
-def init_case(contract_id):
+def init_case(contract_id, uid):
     info = medsenger_api.get_patient_info(contract_id)
-    netrika_api.create_case(info['id'], info['doctor_id'], contract_id, info['doctor_name'])
+    netrika_api.create_case(uid, info['doctor_id'], contract_id, info['doctor_name'])
 
 
 @app.route('/init', methods=['POST'])
@@ -44,16 +46,17 @@ def init(data):
     contract_id = data.get('contract_id')
     info = medsenger_api.get_patient_info(contract_id)
     patient = Patient.query.filter_by(id=info['id']).first()
+    uid = str(uuid.uuid4())
 
     if not patient:
         netrika_id = None
         patient = Patient(id=info['id'], netrika_id=netrika_id, sent_documents=[])
         patient.police = data.get('params', {}).get('police')
-        init_patient(patient, contract_id)
+        init_patient(patient, contract_id, uid)
         db.session.add(patient)
 
     if patient.netrika_id:
-        init_case(contract_id)
+        init_case(contract_id, uid)
 
     contract = Contract(id=contract_id, patient_id=info['id'])
     db.session.add(contract)
@@ -101,26 +104,25 @@ def gs(args, form):
     contract = Contract.query.filter_by(id=args.get('contract_id')).first()
     if not contract:
         abort(404)
-    if contract.patient.netrika_id:
-        return "<h3>Связь с региональной системой успешно установлена.</h3><p>Этот интеллектуальный агент будет автоматически пересылать все новые документы. Дополнительная настройка не требуется.</p>"
     return render_template('settings.html', patient=contract.patient, error='')
 
 
 def ss(args, form):
     contract_id = args.get('contract_id')
     contract = Contract.query.filter_by(id=contract_id).first()
+    uid = str(uuid.uuid4())
 
     if contract:
         patient = contract.patient
         patient.police = form.get('police')
-        init_patient(patient, contract_id)
+        init_patient(patient, contract_id, uid)
         db.session.commit()
 
         if patient.netrika_id:
-            init_case(contract_id)
+            init_case(contract_id, uid)
             return "<strong>Спасибо, окно можно закрыть</strong><script>window.parent.postMessage('close-modal-success','*');</script>"
         else:
-            return render_template('settings.html', patient=contract.patient, error='Проверьте правильность полиса.')
+            return render_template('settings.html', contract=contract, error='Проверьте правильность полиса.')
     else:
         abort(404)
 

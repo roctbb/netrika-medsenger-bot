@@ -4,6 +4,14 @@
 {% block content %}
     <div class="container" style="margin-top: 15px;">
 
+        {% if contract.netrika_id %}
+            <div class="alert alert-success" role="alert">
+                <h3>Связь с региональной системой успешно установлена.</h3>
+                <p>Этот интеллектуальный агент будет автоматически пересылать все новые документы. Дополнительная настройка не требуется.</p>
+                <p><i>Если СНИЛС или ФИО пациента были указаны неправильно, можно переподключить пациента ниже.</i></p>
+            </div>
+        {% endif %}
+
         {% if error %}
             <div class="alert alert-danger" role="alert">
                 {{ error }}
@@ -14,7 +22,7 @@
             <h6>СНИЛС:</h6>
 
             <div class="form-group">
-                <input type="text" class="form-control" name="police" id="police" value="{% if patient.police %}{{ patient.police }}{% endif %}"/>
+                <input type="text" class="form-control" name="police" id="police" value="{% if contract.patient.police %}{{ contract.patient.police }}{% endif %}"/>
             </div>
 
             <button class="btn btn-success">Сохранить</button>

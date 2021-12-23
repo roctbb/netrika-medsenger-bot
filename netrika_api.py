@@ -1,4 +1,5 @@
 import base64
+import uuid
 from datetime import datetime
 
 import requests
@@ -40,7 +41,7 @@ def create_case(patient_id, doctor_id, contract_id, doctor_name):
         "params": {
             "open_date": datetime.now().strftime('%Y-%m-%d'),
             "doctor_name": doctor_name,
-            "patient_id": patient_id,
+            "patient_id": uuid.uuid4(),
             "doctor_id": doctor_id,
             "contract_id": contract_id
         }

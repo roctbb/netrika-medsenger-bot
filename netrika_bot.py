@@ -155,30 +155,48 @@ def documents(args, form):
 @verify_args
 def download(args, form):
     contract_id = args.get('contract_id')
+    download = form.get('download')
     contract = Contract.query.filter_by(id=contract_id).first()
 
     document_id = form.get('document_id')
 
     if contract and contract.patient.netrika_id:
-        documents = list(filter(lambda x: x['document_id'] == document_id, contract.patient.available_documents))
+        if not download:
 
-        if not documents:
-            abort(404)
+            documents = list(filter(lambda x: x['document_id'] == document_id, contract.patient.available_documents))
 
-        document = documents[0]
-        name = document['description']
-        org = document['organization']
-        date = document['indexed']
+            if not documents:
+                abort(404)
 
-        answer = netrika_api.echo_document(document_id)
-        if not answer:
-            abort(404)
+            document = documents[0]
+            name = document['description']
+            org = document['organization']
+            date = document['indexed']
 
-        _, _, data = answer
+            answer = netrika_api.echo_document(document_id)
+            if not answer:
+                abort(404)
 
-        print("requested document ", document_id)
+            _, _, data = answer
 
-        return render_template('document.html', name=name, org=org, date=date, data=str(data).lstrip("b'").rstrip("'"), contract=contract)
+            print("requested document ", document_id)
+
+            return render_template('document.html', name=name, org=org, date=date, data=str(data).lstrip("b'").rstrip("'"), contract=contract, document_id=document_id)
+        else:
+            answer = netrika_api.get_document(document_id)
+
+            if not answer:
+                abort(404)
+
+            name, mime, data = answer
+
+            print("requested document ", document_id)
+
+            response = make_response(data)
+            response.headers.set('Content-Type', mime)
+            response.headers.set(
+                'Content-Disposition', 'attachment', filename=name)
+            return response
     else:
         abort(404)
 

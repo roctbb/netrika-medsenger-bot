@@ -20,11 +20,17 @@
         <div class="col">
             <h5>{{ name }}</h5>
             <p class="small text-muted">{{ org }}<br><b>{{ date }}</b></p>
-            <form onsubmit="back()">
+            <form onsubmit="back()" style="display: inline;">
                 <input type="hidden" name="action" value="documents">
                 <input type="hidden" name="contract_id" value="{{ contract.id }}">
                 <input type="hidden" name="api_token" id="token" value="">
                 <button class="btn-info btn btn-sm">Назад</button>
+            </form>
+
+            <form method="post" style="display: inline;">
+                <input type="hidden" name="document_id" value="{{ document_id }}"/>
+                <input type="hidden" name="download" value="true"/>
+                <button class="btn btn-primary btn-sm">Скачать</button>
             </form>
         </div>
     </div>
@@ -75,7 +81,7 @@
                 var container = document.getElementById('pdf-viewer');
                 var uscale = container.clientWidth / viewport.width;
 
-                if (uscale < 0.8)  {
+                if (uscale < 0.8) {
                     uscale = 0.8;
                 }
 

@@ -18,14 +18,14 @@
             </div>
         {% endif %}
 
-        <form class="form" method="post">
+        <form class="form" method="post" onsubmit="$('#submitButton').prop('disabled', true); return true;">
             <h6>СНИЛС:</h6>
 
             <div class="form-group">
                 <input type="text" class="form-control" name="police" id="police" value="{% if contract.patient.police %}{{ contract.patient.police }}{% endif %}"/>
             </div>
 
-            <button class="btn btn-success" id="submitButton" onclick="$('#submitButton').prop('disabled', true);">Сохранить</button>
+            <button class="btn btn-success" id="submitButton">Сохранить</button>
         </form>
 
         <script>

@@ -51,37 +51,32 @@
         // The workerSrc property shall be specified.
         pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdn.jsdelivr.net/npm/pdfjs-dist@2.6.347/build/pdf.worker.js';
 
-
+        pdfData = atob('{{ data }}');
         // Using DocumentInitParameters object to load binary data.
         var loadingTask = pdfjsLib.getDocument({data: pdfData});
         loadingTask.promise.then(function (pdf) {
-            console.log('PDF loaded');
+            thePdf = pdf;
+            viewer = document.getElementById('pdf-viewer');
 
-            // Fetch the first page
-            var pageNumber = 1;
-            pdf.getPage(pageNumber).then(function (pdf) {
-                thePdf = pdf;
-                viewer = document.getElementById('the-canvas');
-
-                for (page = 1; page <= pdf.numPages; page++) {
-                    canvas = document.createElement("canvas");
-                    canvas.className = 'pdf-page-canvas';
-                    viewer.appendChild(canvas);
-                    renderPage(page, canvas);
-                }
-            }, function (reason) {
-                // PDF loading error
-                console.error(reason);
-            });
-
-            function renderPage(pageNumber, canvas) {
-                thePdf.getPage(pageNumber).then(function (page) {
-                    viewport = page.getViewport({scale: scale});
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
-                    page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});
-                });
+            for (page = 1; page <= pdf.numPages; page++) {
+                canvas = document.createElement("canvas");
+                canvas.className = 'pdf-page-canvas';
+                viewer.appendChild(canvas);
+                renderPage(page, canvas);
             }
+        }, function (reason) {
+            // PDF loading error
+            console.error(reason);
+        });
+
+        function renderPage(pageNumber, canvas) {
+            thePdf.getPage(pageNumber).then(function (page) {
+                viewport = page.getViewport({scale: scale});
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});
+            });
+        }
 
     </script>
 {% endblock %}

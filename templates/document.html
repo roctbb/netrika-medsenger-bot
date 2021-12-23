@@ -13,9 +13,11 @@
             </form>
         </div>
     </div>
-    <object data="data:application/pdf;base64,{{ data }}" type="application/pdf" style="width: 100vw; height: calc(100vh - 150px);">
-        <iframe src="https://docs.google.com/viewer?&embedded=true"></iframe>
-    </object>
+
+    <canvas id="the-canvas"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js" integrity="sha512-qa1o08MA0596eSNsnkRv5vuGloSKUhY09O31MY2OJpODjUVlaL0GOJJcyt7J7Z61FiEgHMgBkH04ZJ+vcuLs/w=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
         function back() {
@@ -26,5 +28,48 @@
             $('#token').val(c);
             return true;
         }
+
+        var pdfData = atob('{{ data }}');
+
+        // Loaded via <script> tag, create shortcut to access PDF.js exports.
+        var pdfjsLib = window['pdfjs-dist/build/pdf'];
+
+        // The workerSrc property shall be specified.
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
+
+        // Using DocumentInitParameters object to load binary data.
+        var loadingTask = pdfjsLib.getDocument({data: pdfData});
+        loadingTask.promise.then(function (pdf) {
+            console.log('PDF loaded');
+
+            // Fetch the first page
+            var pageNumber = 1;
+            pdf.getPage(pageNumber).then(function (page) {
+                console.log('Page loaded');
+
+                var scale = 1.5;
+                var viewport = page.getViewport({scale: scale});
+
+                // Prepare canvas using PDF page dimensions
+                var canvas = document.getElementById('the-canvas');
+                var context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Render PDF page into canvas context
+                var renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                var renderTask = page.render(renderContext);
+                renderTask.promise.then(function () {
+                    console.log('Page rendered');
+                });
+            });
+        }, function (reason) {
+            // PDF loading error
+            console.error(reason);
+        });
+
     </script>
 {% endblock %}

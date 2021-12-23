@@ -11,15 +11,10 @@
                 <input type="hidden" name="api_token" id="token" value="">
                 <button class="btn-info btn btn-sm">Назад</button>
             </form>
-
-            <button id="prev" class="btn-info btn btn-sm">Previous</button>
-            <button id="next" class="btn-info btn btn-sm">Next</button>
-            &nbsp; &nbsp;
-            <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
         </div>
     </div>
 
-    <canvas id="the-canvas"></canvas>
+    <canvas id="canvas"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.6.347/build/pdf.min.js"></script>
 
@@ -64,7 +59,7 @@
             function handlePages(page) {
                 console.log(page)
                 var viewport = page.getViewport(1);
-                var canvas = document.createElement("canvas");
+                var canvas = document.getElementById('canvas');
                 canvas.style.display = "block";
                 var context = canvas.getContext('2d');
                 canvas.height = viewport.height;
@@ -75,14 +70,14 @@
                     viewport: viewport
                 });
 
-                document.body.appendChild(canvas);
-
                 currPage++;
                 if (thePDF !== null && currPage <= numPages) {
                     thePDF.getPage(currPage).then(handlePages);
                 }
             }
         }
+
+        renderPdfByBase64('{{ data }}'}
 
     </script>
 {% endblock %}

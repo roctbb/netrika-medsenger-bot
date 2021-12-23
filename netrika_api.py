@@ -41,7 +41,7 @@ def create_case(patient_id, doctor_id, contract_id, doctor_name):
         "params": {
             "open_date": datetime.now().strftime('%Y-%m-%d'),
             "doctor_name": doctor_name,
-            "patient_id": uuid.uuid4(),
+            "patient_id": patient_id,
             "doctor_id": doctor_id,
             "contract_id": contract_id
         }

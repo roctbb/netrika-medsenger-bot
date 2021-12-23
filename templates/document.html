@@ -1,6 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Документ в РЕГИЗ{% endblock %}
 {% block content %}
+    <style>
+        #pdf-viewer {
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            overflow: auto;
+        }
+
+        .pdf-page-canvas {
+            display: block;
+            margin: 5px auto;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+    </style>
+
     <div class="row" style="margin: 5px;">
         <div class="col">
             <h5>{{ name }}</h5>
@@ -14,7 +29,7 @@
         </div>
     </div>
 
-    <canvas id="canvas"></canvas>
+    <div id='pdf-viewer'></div>
 
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.6.347/build/pdf.min.js"></script>
 
@@ -28,7 +43,8 @@
             return true;
         }
 
-
+        var thePdf = null;
+        var scale = 1;
         // Loaded via <script> tag, create shortcut to access PDF.js exports.
         var pdfjsLib = window['pdfjs-dist/build/pdf'];
 
@@ -36,48 +52,36 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdn.jsdelivr.net/npm/pdfjs-dist@2.6.347/build/pdf.worker.js';
 
 
-        function renderPdfByBase64(base64Data) {
-            var currPage = 1; // 当前页面
-            var numPages = 0; // 总页数，由getDocument后获取
-            var thePDF = null;
-            var pdfData = base64ToUint8Array(base64Data);
-            pdfjsLib.getDocument(pdfData).then(function (pdf) {
-                thePDF = pdf;
-                numPages = pdf.numPages;
-                pdf.getPage(1).then(handlePages);
+        // Using DocumentInitParameters object to load binary data.
+        var loadingTask = pdfjsLib.getDocument({data: pdfData});
+        loadingTask.promise.then(function (pdf) {
+            console.log('PDF loaded');
+
+            // Fetch the first page
+            var pageNumber = 1;
+            pdf.getPage(pageNumber).then(function (pdf) {
+                thePdf = pdf;
+                viewer = document.getElementById('the-canvas');
+
+                for (page = 1; page <= pdf.numPages; page++) {
+                    canvas = document.createElement("canvas");
+                    canvas.className = 'pdf-page-canvas';
+                    viewer.appendChild(canvas);
+                    renderPage(page, canvas);
+                }
+            }, function (reason) {
+                // PDF loading error
+                console.error(reason);
             });
 
-            function base64ToUint8Array(base64) {
-                var raw = atob(base64);
-                var uint8Array = new Uint8Array(raw.length);
-                for (var i = 0; i < raw.length; i++) {
-                    uint8Array[i] = raw.charCodeAt(i);
-                }
-                return uint8Array;
-            }
-
-            function handlePages(page) {
-                console.log(page)
-                var viewport = page.getViewport(1);
-                var canvas = document.getElementById('canvas');
-                canvas.style.display = "block";
-                var context = canvas.getContext('2d');
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-
-                page.render({
-                    canvasContext: context,
-                    viewport: viewport
+            function renderPage(pageNumber, canvas) {
+                thePdf.getPage(pageNumber).then(function (page) {
+                    viewport = page.getViewport({scale: scale});
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});
                 });
-
-                currPage++;
-                if (thePDF !== null && currPage <= numPages) {
-                    thePDF.getPage(currPage).then(handlePages);
-                }
             }
-        }
-
-        renderPdfByBase64('{{ data }}')
 
     </script>
 {% endblock %}

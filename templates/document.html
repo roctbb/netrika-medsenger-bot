@@ -16,8 +16,7 @@
 
     <canvas id="the-canvas"></canvas>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js" integrity="sha512-qa1o08MA0596eSNsnkRv5vuGloSKUhY09O31MY2OJpODjUVlaL0GOJJcyt7J7Z61FiEgHMgBkH04ZJ+vcuLs/w=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.6.347/build/pdf.min.js"></script>
 
     <script>
         function back() {
@@ -35,7 +34,8 @@
         var pdfjsLib = window['pdfjs-dist/build/pdf'];
 
         // The workerSrc property shall be specified.
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdn.jsdelivr.net/npm/pdfjs-dist@2.6.347/build/pdf.worker.js';
+
 
         // Using DocumentInitParameters object to load binary data.
         var loadingTask = pdfjsLib.getDocument({data: pdfData});

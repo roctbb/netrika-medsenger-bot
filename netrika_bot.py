@@ -33,6 +33,7 @@ def init_patient(patient, contract_id, uid):
         info = medsenger_api.get_patient_info(contract_id)
         patient.netrika_id = netrika_api.add_patient(uid, info['email'], info['name'], info['birthday'], info['sex'],
                                                      patient.police)
+        patient.available_documents = None
 
 
 def init_case(contract_id, uid):

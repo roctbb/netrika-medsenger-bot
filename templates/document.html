@@ -1,20 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Документ в РЕГИЗ{% endblock %}
 {% block content %}
-    <div class="row" style="margin-left:5px; margin-right: 5px;">
-        <div class="col-8">
+    <div class="row" style="margin-left:5px; margin-right: 5px; margin-bottom: 5px;">
+        <div class="col">
             <h5>{{ name }}</h5>
-        </div>
-        <div class="col-4">
+            <p class="small text-muted">{{ org }}<br><b>{{ date }}</b></p>
             <form>
+                <input type="hidden" name="action" value="/documents">
+                <input type="hidden" name="contract_id" value="{{ contract.id }}">
                 <button class="btn-info btn btn-sm">Назад</button>
             </form>
         </div>
-        <div class="col">
-            <p class="small text-muted">{{ org }}<br><b>{{ date }}</b></p>
-
-        </div>
     </div>
-    <iframe src="data:application/pdf;base64,{{ data }}" width="100%" height="100%"></iframe>
+    <iframe src="data:application/pdf;base64,{{ data }}" width="100%" height="100%" style="min-height: 100%;"></iframe>
 
 {% endblock %}

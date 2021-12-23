@@ -178,7 +178,7 @@ def download(args, form):
 
         print("requested document ", document_id)
 
-        return render_template('document.html', name=name, org=org, date=date, data=str(data))
+        return render_template('document.html', name=name, org=org, date=date, data=str(data).lstrip("b'").rstrip("'"))
     else:
         abort(404)
 

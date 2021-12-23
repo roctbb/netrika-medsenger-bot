@@ -165,7 +165,7 @@ def download(args, form):
         if not documents:
             abort(404)
 
-        document = next(documents)
+        document = documents[0]
         name = document['description']
         org = document['organization']
         date = document['indexed']

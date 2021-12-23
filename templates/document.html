@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Документ в РЕГИЗ{% endblock %}
+{% block content %}
+    <div class="row" style="margin-left:5px; margin-right: 5px;">
+        <div class="col">
+            <h5>{{ name }}</h5>
+            <p class="small text-muted">{{ org }}<br><b>{{ date }}</b></p>
+            <form>
+                <button class="btn-info btn btn-sm">Назад</button>
+            </form>
+        </div>
+    </div>
+    <iframe src="data:application/pdf;base64,{{ data }}" width="100%"></iframe>
+
+{% endblock %}

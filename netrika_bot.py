@@ -160,8 +160,17 @@ def download(args, form):
     document_id = form.get('document_id')
 
     if contract and contract.patient.netrika_id:
-        answer = netrika_api.get_document(document_id)
+        documents = list(filter(lambda x: x['document_id'] == document_id, contract.patient.available_documents))
 
+        if not documents:
+            abort(404)
+
+        document = next(documents)
+        name = document['description']
+        org = document['organization']
+        date = document['indexed']
+
+        answer = netrika_api.echo_document(document_id)
         if not answer:
             abort(404)
 
@@ -169,11 +178,7 @@ def download(args, form):
 
         print("requested document ", document_id)
 
-        response = make_response(data)
-        response.headers.set('Content-Type', mime)
-        response.headers.set(
-            'Content-Disposition', 'attachment', filename=name)
-        return response
+        return render_template('document.html', name=name, org=org, date=date, data=data)
     else:
         abort(404)
 

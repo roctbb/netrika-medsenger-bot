@@ -25,7 +25,7 @@
                 <input type="text" class="form-control" name="police" id="police" value="{% if contract.patient.police %}{{ contract.patient.police }}{% endif %}"/>
             </div>
 
-            <button class="btn btn-success">Сохранить</button>
+            <button class="btn btn-success" id="submitButton" onclick="$('#submitButton').prop('disabled', true);">Сохранить</button>
         </form>
 
         <script>

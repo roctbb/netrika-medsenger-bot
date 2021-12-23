@@ -174,7 +174,7 @@ def download(args, form):
         if not answer:
             abort(404)
 
-        name, mime, data = answer
+        _, _, data = answer
 
         print("requested document ", document_id)
 

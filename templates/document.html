@@ -44,7 +44,7 @@
         }
 
         var thePdf = null;
-        var scale = 1.5;
+        var scale = 1;
         // Loaded via <script> tag, create shortcut to access PDF.js exports.
         var pdfjsLib = window['pdfjs-dist/build/pdf'];
 
@@ -71,7 +71,10 @@
 
         function renderPage(pageNumber, canvas) {
             thePdf.getPage(pageNumber).then(function (page) {
-                viewport = page.getViewport({scale: scale});
+                var viewport = page.getViewport({scale: scale});
+                var container = document.getElementById('pdf-viewer');
+                var uscale = container.clientWidth / viewport.width;
+                viewport = page.getViewport({scale: uscale});
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
                 page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});

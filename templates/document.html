@@ -11,6 +11,11 @@
                 <input type="hidden" name="api_token" id="token" value="">
                 <button class="btn-info btn btn-sm">Назад</button>
             </form>
+
+            <button id="prev" class="btn-info btn btn-sm">Previous</button>
+            <button id="next" class="btn-info btn btn-sm">Next</button>
+            &nbsp; &nbsp;
+            <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
         </div>
     </div>
 
@@ -28,7 +33,6 @@
             return true;
         }
 
-        var pdfData = atob('{{ data }}');
 
         // Loaded via <script> tag, create shortcut to access PDF.js exports.
         var pdfjsLib = window['pdfjs-dist/build/pdf'];
@@ -37,39 +41,48 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdn.jsdelivr.net/npm/pdfjs-dist@2.6.347/build/pdf.worker.js';
 
 
-        // Using DocumentInitParameters object to load binary data.
-        var loadingTask = pdfjsLib.getDocument({data: pdfData});
-        loadingTask.promise.then(function (pdf) {
-            console.log('PDF loaded');
+        function renderPdfByBase64(base64Data) {
+            var currPage = 1; // 当前页面
+            var numPages = 0; // 总页数，由getDocument后获取
+            var thePDF = null;
+            var pdfData = base64ToUint8Array(base64Data);
+            pdfjsLib.getDocument(pdfData).then(function (pdf) {
+                thePDF = pdf;
+                numPages = pdf.numPages;
+                pdf.getPage(1).then(handlePages);
+            });
 
-            // Fetch the first page
-            var pageNumber = 1;
-            pdf.getPage(pageNumber).then(function (page) {
-                console.log('Page loaded');
+            function base64ToUint8Array(base64) {
+                var raw = atob(base64);
+                var uint8Array = new Uint8Array(raw.length);
+                for (var i = 0; i < raw.length; i++) {
+                    uint8Array[i] = raw.charCodeAt(i);
+                }
+                return uint8Array;
+            }
 
-                var scale = 1.5;
-                var viewport = page.getViewport({scale: scale});
-
-                // Prepare canvas using PDF page dimensions
-                var canvas = document.getElementById('the-canvas');
+            function handlePages(page) {
+                console.log(page)
+                var viewport = page.getViewport(1);
+                var canvas = document.createElement("canvas");
+                canvas.style.display = "block";
                 var context = canvas.getContext('2d');
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
 
-                // Render PDF page into canvas context
-                var renderContext = {
+                page.render({
                     canvasContext: context,
                     viewport: viewport
-                };
-                var renderTask = page.render(renderContext);
-                renderTask.promise.then(function () {
-                    console.log('Page rendered');
                 });
-            });
-        }, function (reason) {
-            // PDF loading error
-            console.error(reason);
-        });
+
+                document.body.appendChild(canvas);
+
+                currPage++;
+                if (thePDF !== null && currPage <= numPages) {
+                    thePDF.getPage(currPage).then(handlePages);
+                }
+            }
+        }
 
     </script>
 {% endblock %}

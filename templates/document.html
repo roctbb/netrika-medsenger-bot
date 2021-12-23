@@ -74,6 +74,15 @@
                 var viewport = page.getViewport({scale: scale});
                 var container = document.getElementById('pdf-viewer');
                 var uscale = container.clientWidth / viewport.width;
+
+                if (uscale < 0.8)  {
+                    uscale = 0.8;
+                }
+
+                if (uscale > 1.5) {
+                    uscale = 1.5;
+                }
+
                 viewport = page.getViewport({scale: uscale});
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;

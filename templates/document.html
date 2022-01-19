@@ -43,13 +43,25 @@
         return true;
     }
 
+    function base64ToBlob(base64) {
+        const binaryString = window.atob(base64);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; ++i) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        return new Blob([bytes], {type: 'application/pdf'});
+    };
+
     WebViewer({
         path: 'https://medsenger.ru/scripts/pdf', // path to the PDF.js Express'lib' folder on your server
         licenseKey: 'B0sbF5yE2WumTidaXqD5',
-        initialDoc: 'https://pdftron.s3.amazonaws.com/downloads/pl/webviewer-demo.pdf',
         // initialDoc: '/path/to/my/file.pdf',  // You can also use documents on your server
     }, document.getElementById('pdf-viewer'))
         .then(instance => {
+            instance.UI.loadDocument(base64ToBlob("{{ data }}"), { filename: 'myfile.pdf' });
+
             // now you can access APIs through the WebViewer instance
             const {Core, UI} = instance;
 

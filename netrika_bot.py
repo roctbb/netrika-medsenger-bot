@@ -59,7 +59,7 @@ def init(data):
     if patient.netrika_id:
         init_case(contract_id, uid)
 
-    contract = Patient.query.filter_by(id=contract_id).first()
+    contract = Contract.query.filter_by(id=contract_id).first()
 
     if not contract:
         contract = Contract(id=contract_id, patient_id=info['id'])

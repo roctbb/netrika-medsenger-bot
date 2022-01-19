@@ -152,12 +152,12 @@
         });
     }
 
-    document.addEventListener('webviewerloaded', () => {
+    setTimeout(function () {
         if (!pinchZoomEnabled) {
             pinchZoomEnabled = true;
             enablePinchZoom();
             console.log("enabled");
         }
-    });
+    }, 0);
 </script>
 {% endblock %}

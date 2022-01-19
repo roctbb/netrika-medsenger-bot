@@ -37,127 +37,30 @@
 
 <div id='pdf-viewer'></div>
 
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.6.347/build/pdf.min.js"></script>
+<script src="https://medsenger.ru/scripts/pdf/webviewer.min.js"></script>
 
 <script>
-    function back() {
-        var url_string = window.location.href;
-        var url = new URL(url_string);
-        var c = url.searchParams.get("api_token");
+  WebViewer({
+    path: 'WebViewer/lib', // path to the PDF.js Express'lib' folder on your server
+    licenseKey: 'Insert commercial license key here after purchase',
+    initialDoc: 'https://pdftron.s3.amazonaws.com/downloads/pl/webviewer-demo.pdf',
+    // initialDoc: '/path/to/my/file.pdf',  // You can also use documents on your server
+  }, document.getElementById('viewer'))
+  .then(instance => {
+    // now you can access APIs through the WebViewer instance
+    const { Core, UI } = instance;
 
-        $('#token').val(c);
-        return true;
-    }
-
-    var thePdf = null;
-    var scale = 1;
-    // Loaded via <script> tag, create shortcut to access PDF.js exports.
-    var pdfjsLib = window['pdfjs-dist/build/pdf'];
-
-    // The workerSrc property shall be specified.
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdn.jsdelivr.net/npm/pdfjs-dist@2.6.347/build/pdf.worker.js';
-
-    pdfData = atob('{{ data }}');
-    // Using DocumentInitParameters object to load binary data.
-    var loadingTask = pdfjsLib.getDocument({data: pdfData});
-    loadingTask.promise.then(function (pdf) {
-        thePdf = pdf;
-        viewer = document.getElementById('pdf-viewer');
-
-        for (page = 1; page <= pdf.numPages; page++) {
-            canvas = document.createElement("canvas");
-            canvas.className = 'pdf-page-canvas';
-            viewer.appendChild(canvas);
-            renderPage(page, canvas);
-        }
-    }, function (reason) {
-        // PDF loading error
-        console.error(reason);
+    // adding an event listener for when a document is loaded
+    Core.documentViewer.addEventListener('documentLoaded', () => {
+      console.log('document loaded');
     });
 
-    function renderPage(pageNumber, canvas) {
-        thePdf.getPage(pageNumber).then(function (page) {
-            var viewport = page.getViewport({scale: scale});
-            var container = document.getElementById('pdf-viewer');
-            var uscale = container.clientWidth / viewport.width;
-
-            if (uscale < 0.8) {
-                uscale = 0.8;
-            }
-
-            if (uscale > 1.5) {
-                uscale = 1.5;
-            }
-
-            viewport = page.getViewport({scale: uscale});
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-            page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});
-        });
-    }
-
+    // adding an event listener for when the page number has changed
+    Core.documentViewer.addEventListener('pageNumberUpdated', (pageNumber) => {
+      console.log(`Page number is: ${pageNumber}`);
+    });
+  });
 </script>
 
-<script>
-    let pinchZoomEnabled = false;
 
-    function enablePinchZoom(pdfViewer) {
-        let startX = 0, startY = 0;
-        let initialPinchDistance = 0;
-        let pinchScale = 1;
-        const viewer = document.getElementById("pdf-viewer");
-        const container = document.getElementsByClassName("pdf-page-canvas")[0];
-        const reset = () => {
-            startX = startY = initialPinchDistance = 0;
-            pinchScale = 1;
-        };
-        // Prevent native iOS page zoom
-        //document.addEventListener("touchmove", (e) => { if (e.scale !== 1) { e.preventDefault(); } }, { passive: false });
-        document.addEventListener("touchstart", (e) => {
-            if (e.touches.length > 1) {
-                startX = (e.touches[0].pageX + e.touches[1].pageX) / 2;
-                startY = (e.touches[0].pageY + e.touches[1].pageY) / 2;
-                initialPinchDistance = Math.hypot((e.touches[1].pageX - e.touches[0].pageX), (e.touches[1].pageY - e.touches[0].pageY));
-            } else {
-                initialPinchDistance = 0;
-            }
-        });
-        document.addEventListener("touchmove", (e) => {
-            if (initialPinchDistance <= 0 || e.touches.length < 2) {
-                return;
-            }
-            if (e.scale !== 1) {
-                e.preventDefault();
-            }
-            const pinchDistance = Math.hypot((e.touches[1].pageX - e.touches[0].pageX), (e.touches[1].pageY - e.touches[0].pageY));
-            const originX = startX + container.scrollLeft;
-            const originY = startY + container.scrollTop;
-            pinchScale = pinchDistance / initialPinchDistance;
-            viewer.style.transform = `scale(${pinchScale})`;
-            viewer.style.transformOrigin = `${originX}px ${originY}px`;
-        }, {passive: false});
-        document.addEventListener("touchend", (e) => {
-            if (initialPinchDistance <= 0) {
-                return;
-            }
-            viewer.style.transform = `none`;
-            viewer.style.transformOrigin = `unset`;
-            pdfjsLib.pdfViewer.currentScale *= pinchScale;
-            const rect = container.getBoundingClientRect();
-            const dx = startX - rect.left;
-            const dy = startY - rect.top;
-            container.scrollLeft += dx * (pinchScale - 1);
-            container.scrollTop += dy * (pinchScale - 1);
-            reset();
-        });
-    }
-
-    setTimeout(function () {
-        if (!pinchZoomEnabled) {
-            pinchZoomEnabled = true;
-            enablePinchZoom();
-            console.log("enabled");
-        }
-    }, 1000);
-</script>
 {% endblock %}

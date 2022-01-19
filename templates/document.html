@@ -98,15 +98,15 @@
 
 </script>
 
-<!--<script>
+<script>
     let pinchZoomEnabled = false;
 
     function enablePinchZoom(pdfViewer) {
         let startX = 0, startY = 0;
         let initialPinchDistance = 0;
         let pinchScale = 1;
-        const viewer = document.getElementById("viewer");
-        const container = document.getElementById("pdf-viewer");
+        const viewer = document.getElementById("pdf-viewer");
+        const container = document.getElementsByClassName("pdf-page-canvas")[0];
         const reset = () => {
             startX = startY = initialPinchDistance = 0;
             pinchScale = 1;
@@ -158,5 +158,5 @@
             enablePinchZoom();
         }
     });
-</script>-->
+</script>
 {% endblock %}

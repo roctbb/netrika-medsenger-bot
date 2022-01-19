@@ -142,7 +142,7 @@
             }
             viewer.style.transform = `none`;
             viewer.style.transformOrigin = `unset`;
-            PDFViewerApplication.pdfViewer.currentScale *= pinchScale;
+            pdfjsLib.pdfViewer.currentScale *= pinchScale;
             const rect = container.getBoundingClientRect();
             const dx = startX - rect.left;
             const dy = startY - rect.top;
@@ -158,6 +158,6 @@
             enablePinchZoom();
             console.log("enabled");
         }
-    }, 0);
+    }, 1000);
 </script>
 {% endblock %}

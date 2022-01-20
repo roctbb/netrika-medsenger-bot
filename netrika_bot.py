@@ -214,18 +214,19 @@ def tasks(app):
                 if not patient.available_documents:
                     patient.available_documents = docs
 
-                new_docs = filter(lambda doc: doc.get('document_id') and doc.get('document_id') not in patient.sent_documents, docs)
-
                 if not patient.sent_documents:
-                    for doc in new_docs:
+                    patient.sent_documents = []
+                    for doc in docs:
                         patient.sent_documents.append(doc.get('document_id'))
                 else:
+                    new_docs = filter(lambda doc: doc.get('document_id') and doc.get('document_id') not in patient.sent_documents, docs)
                     for doc in new_docs:
                         attachment = netrika_api.echo_document(doc.get('document_id'))
                         for contract in patient.contracts:
                             medsenger_api.send_message(contract_id=contract.id, text="Новый документ в региональной системе: {}".format(doc.get('description')), only_doctor=True, need_answer=False,
                                                        attachments=[attachment])
                         patient.sent_documents.append(doc.get('document_id'))
+                        print("I will save doc {} to {}".format(doc.get('document_id'), patient.id))
         db.session.commit()
 
 

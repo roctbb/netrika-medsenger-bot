@@ -216,9 +216,7 @@ def tasks(app):
                 if not patient.sent_documents:
                     patient.sent_documents = []
                 docs = netrika_api.encounter_search(patient.netrika_id)
-
-                if not patient.available_documents:
-                    patient.available_documents = docs
+                patient.available_documents = docs
 
                 if not patient.sent_documents:
                     patient.sent_documents = []
@@ -233,6 +231,9 @@ def tasks(app):
                                                        attachments=[attachment])
                         patient.sent_documents.append(doc.get('document_id'))
                         print("I will save doc {} to {}".format(doc.get('document_id'), patient.id))
+
+                    patient.sent_documents = patient.sent_documents[:]
+        print("ready to commit")
         db.session.commit()
 
 

@@ -7,6 +7,7 @@ from manage import *
 from medsenger_api import AgentApiClient
 from helpers import *
 from models import *
+from sqlalchemy.orm.attributes import flag_modified
 
 medsenger_api = AgentApiClient(API_KEY, MAIN_HOST, AGENT_ID, API_DEBUG)
 
@@ -232,7 +233,8 @@ def tasks(app):
                         patient.sent_documents.append(doc.get('document_id'))
                         print("I will save doc {} to {}".format(doc.get('document_id'), patient.id))
 
-                    patient.sent_documents = patient.sent_documents[:]
+                flag_modified(patient, "sent_documents")
+                flag_modified(patient, "available_documents")
         print("ready to commit")
         db.session.commit()
 

@@ -11,6 +11,20 @@ from sqlalchemy.orm.attributes import flag_modified
 
 medsenger_api = AgentApiClient(API_KEY, MAIN_HOST, AGENT_ID, API_DEBUG)
 
+def filter_conditions(conditions):
+    condition_description = set()
+    conditions = []
+
+    for condition in conditions:
+        descr = (condition['name'], condition['organization'])
+
+        if descr in condition_description:
+            continue
+
+        conditions.append(condition)
+        condition_description.add(descr)
+
+    return conditions
 
 @app.route('/')
 def index():
@@ -158,7 +172,7 @@ def documents(args, form):
                 patient.available_conditions = conditions
 
             db.session.commit()
-            return render_template('documents.html', documents=documents, conditions=conditions)
+            return render_template('documents.html', documents=documents, conditions=filter_conditions(conditions))
         else:
             return render_template('documents.html', documents=[], conditions=[])
     else:

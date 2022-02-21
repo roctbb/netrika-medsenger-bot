@@ -13,7 +13,7 @@ medsenger_api = AgentApiClient(API_KEY, MAIN_HOST, AGENT_ID, API_DEBUG)
 
 def filter_conditions(conditions):
     condition_description = set()
-    conditions = []
+    filtered_conditions = []
 
     for condition in conditions:
         descr = (condition['name'], condition['organization'])
@@ -21,10 +21,10 @@ def filter_conditions(conditions):
         if descr in condition_description:
             continue
 
-        conditions.append(condition)
+        filtered_conditions.append(condition)
         condition_description.add(descr)
 
-    return conditions
+    return filtered_conditions
 
 @app.route('/')
 def index():

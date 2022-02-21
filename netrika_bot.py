@@ -226,9 +226,8 @@ def tasks(app):
 
                 docs = netrika_api.encounter_search(patient.netrika_id)
                 patient.available_documents = docs
-                conditions = netrika_api.condition_search(patient.netrika_id)
 
-                patient.available_documents = docs
+                conditions = netrika_api.condition_search(patient.netrika_id)
                 patient.available_conditions = conditions
 
                 if not patient.sent_documents:

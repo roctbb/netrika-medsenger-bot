@@ -1,26 +1,38 @@
 {% extends "base.html" %}
 {% block title %}Документы в РЕГИЗ{% endblock %}
 {% block content %}
-    <div class="row" style="margin-left:5px; margin-right: 5px;">
-        {% for document in documents %}
-            <div class="col-12 col-md-4" style="padding-top: 5px; padding-bottom: 5px;">
-                <form method="post">
+<div class="row" style="margin-left:5px; margin-right: 5px;">
+    <h3>Состояния и диагнозы</h3>
 
-                    <input type="hidden" name="document_id" value="{{ document['document_id'] }}">
-
-
-                    <div class="card">
-                        <div class="card-body">
-                            <p class="card-text" style="margin-bottom: 5px;">{{ document['description'] }}</p>
-                            <p class="text-muted"><small>{{ document['organization'] }}<br>{{ document['indexed'] }}</small></p>
-                            <button class="btn btn-primary btn-sm">Скачать</button>
-                        </div>
-                    </div>
-
-
-                </form>
+    {% for condition in conditions %}
+    <div class="col-12 col-md-4" style="padding-top: 5px; padding-bottom: 5px;">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text" style="margin-bottom: 5px;">{{ condition['name'] }}</p>
+                    <p class="text-muted"><small>{{ condition['organization'] }}<br>{{ condition['date'] }}<br>{% for coding in condition['codings'] %}
+                        {{ coding }},
+                    {% endfor %}</small></p>
+                    <button class="btn btn-primary btn-sm">Скачать</button>
+                </div>
             </div>
-            <br>
-        {% endfor %}
     </div>
+    {% endfor %}
+
+    <h3>Документы</h3>
+    {% for document in documents %}
+    <div class="col-12 col-md-4" style="padding-top: 5px; padding-bottom: 5px;">
+        <form method="post">
+            <input type="hidden" name="document_id" value="{{ document['document_id'] }}">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text" style="margin-bottom: 5px;">{{ document['description'] }}</p>
+                    <p class="text-muted"><small>{{ document['organization'] }}<br>{{ document['indexed'] }}</small></p>
+                    <button class="btn btn-primary btn-sm">Скачать</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <br>
+    {% endfor %}
+</div>
 {% endblock %}

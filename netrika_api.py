@@ -84,6 +84,29 @@ def encounter_search(patient_netrika_id):
         print(e)
         return None
 
+def condition_search(patient_netrika_id):
+    data = {
+        "command": "condition_search",
+        "params": {
+            "patient_netrika_id": patient_netrika_id
+        }
+    }
+
+    print("Send to {}: {}".format(NETRIKA_HOST, data))
+
+    try:
+        answer = requests.post(NETRIKA_HOST, json=data)
+        print(answer.text)
+
+        if answer.json().get('status') != 'ok':
+            return None
+
+        return answer.json().get('data')
+    except Exception as e:
+        print(e)
+        return None
+
+
 def echo_document(document_id):
     data = {
         "command": "echo_document",

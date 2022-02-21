@@ -7,6 +7,7 @@ from manage import *
 from medsenger_api import AgentApiClient
 from helpers import *
 from models import *
+from sqlalchemy.orm.attributes import flag_modified
 
 medsenger_api = AgentApiClient(API_KEY, MAIN_HOST, AGENT_ID, API_DEBUG)
 
@@ -149,13 +150,13 @@ def documents(args, form):
             else:
                 documents = netrika_api.encounter_search(patient.netrika_id)
                 patient.available_documents = documents
-            
+
             if patient.available_conditions:
                 conditions = patient.available_conditions
             else:
                 conditions = netrika_api.condition_search(patient.netrika_id)
                 patient.available_conditions = conditions
-            
+
             db.session.commit()
             return render_template('documents.html', documents=documents, conditions=conditions)
         else:
@@ -224,23 +225,29 @@ def tasks(app):
                     patient.sent_documents = []
 
                 docs = netrika_api.encounter_search(patient.netrika_id)
+                patient.available_documents = docs
                 conditions = netrika_api.condition_search(patient.netrika_id)
 
                 patient.available_documents = docs
                 patient.available_conditions = conditions
 
-                new_docs = filter(lambda doc: doc.get('document_id') and doc.get('document_id') not in patient.sent_documents, docs)
-
                 if not patient.sent_documents:
-                    for doc in new_docs:
+                    patient.sent_documents = []
+                    for doc in docs:
                         patient.sent_documents.append(doc.get('document_id'))
                 else:
+                    new_docs = filter(lambda doc: doc.get('document_id') and doc.get('document_id') not in patient.sent_documents, docs)
                     for doc in new_docs:
                         attachment = netrika_api.echo_document(doc.get('document_id'))
                         for contract in patient.contracts:
                             medsenger_api.send_message(contract_id=contract.id, text="Новый документ в региональной системе: {}".format(doc.get('description')), only_doctor=True, need_answer=False,
                                                        attachments=[attachment])
                         patient.sent_documents.append(doc.get('document_id'))
+                        print("I will save doc {} to {}".format(doc.get('document_id'), patient.id))
+
+                flag_modified(patient, "sent_documents")
+                flag_modified(patient, "available_documents")
+        print("ready to commit")
         db.session.commit()
 
 

@@ -2,23 +2,29 @@
 {% block title %}Документы в РЕГИЗ{% endblock %}
 {% block content %}
 <div class="row" style="margin-left:5px; margin-right: 5px;">
-    <h3>Состояния и диагнозы</h3>
+
+    <div class="col-12">
+        <h4>Состояния и диагнозы</h4>
+    </div>
+
 
     {% for condition in conditions %}
     <div class="col-12 col-md-4" style="padding-top: 5px; padding-bottom: 5px;">
-            <div class="card">
-                <div class="card-body">
-                    <p class="card-text" style="margin-bottom: 5px;">{{ condition['name'] }}</p>
-                    <p class="text-muted"><small>{{ condition['organization'] }}<br>{{ condition['date'] }}<br>{% for coding in condition['codings'] %}
-                        {{ coding }},
+        <div class="card">
+            <div class="card-body">
+                <p class="card-text" style="margin-bottom: 5px;">{{ condition['name'] }}</p>
+                <p class="text-muted"><small>{{ condition['organization'] }}<br>{{ condition['date'] }}<br>{% for coding
+                    in condition['codings'] %}
+                    {{ coding }},
                     {% endfor %}</small></p>
-                    <button class="btn btn-primary btn-sm">Скачать</button>
-                </div>
             </div>
+        </div>
     </div>
     {% endfor %}
 
-    <h3>Документы</h3>
+    <div class="col-12">
+        <h4>Документы</h4>
+    </div>
     {% for document in documents %}
     <div class="col-12 col-md-4" style="padding-top: 5px; padding-bottom: 5px;">
         <form method="post">

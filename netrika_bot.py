@@ -249,7 +249,8 @@ def tasks(app):
                     for doc in docs:
                         patient.sent_documents.append(doc.get('document_id'))
                 else:
-                    new_docs = filter(lambda doc: doc.get('document_id') and doc.get('document_id') not in patient.sent_documents, docs)
+                    docs_set = set(map(lambda x: x.get('document_id'), docs))
+                    new_docs = filter(lambda doc: doc.get('document_id') and doc.get('document_id') not in patient.sent_documents and doc.get('document_id') in docs_set, docs)
                     for doc in new_docs:
                         attachment = netrika_api.echo_document(doc.get('document_id'))
                         for contract in patient.contracts:

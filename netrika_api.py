@@ -51,7 +51,6 @@ def create_case(patient_id, doctor_id, contract_id, doctor_name):
 
     try:
         answer = requests.post(NETRIKA_HOST, json=data)
-        print(answer.text)
 
         if answer.json().get('status') != 'ok':
             return None
@@ -74,7 +73,6 @@ def encounter_search(patient_netrika_id):
 
     try:
         answer = requests.post(NETRIKA_HOST, json=data)
-        print(answer.text)
 
         if answer.json().get('status') != 'ok':
             return None
@@ -96,7 +94,6 @@ def condition_search(patient_netrika_id):
 
     try:
         answer = requests.post(NETRIKA_HOST, json=data)
-        print(answer.text)
 
         if answer.json().get('status') != 'ok':
             return None
